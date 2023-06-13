@@ -28,9 +28,10 @@ def printStatus():
 def sale():
     print("sale")
     global amount, capital, profit
-    capital = amount*actualPrice - delta
+    opDelta = amount*actualPrice - amount*purchasePrice
+    capital = amount*actualPrice - opDelta
     amount = 0
-    profit += delta
+    profit += opDelta
 
 
 def buy():
@@ -43,7 +44,7 @@ def buy():
 
 def getPrices():
     res = []
-    for i in range(1, 6):
+    for i in range(1, 9):
         with open(str(i)+".csv", 'r', newline='') as file:
             reader = csv.reader(file)
             res = res + [float(price[4]) for price in reader]
@@ -58,14 +59,18 @@ def trade():
         actualPrice = price
         if amount == 0:
             buy()
-        delta = amount*actualPrice - purchasePrice*amount
+        delta = 100-min(actualPrice,purchasePrice)*100/max(actualPrice, purchasePrice)
+        if actualPrice<purchasePrice:
+            delta = delta * -1
         if delta >= takeProfit:
             sale()
 
 
 def main():
+    global takeProfit
+    takeProfit = float(input("Set a takeprofit in %: "))
     trade()
-    print(profit)
+    print("Profit: ", profit)
 
 
 if __name__ == "__main__":
